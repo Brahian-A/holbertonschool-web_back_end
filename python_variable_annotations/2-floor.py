@@ -4,6 +4,7 @@
 
 import math
 
+
 def floor(n: float) -> int:
     """Funcion que retorna el piso de un flot"""
     return math.floor(n)
