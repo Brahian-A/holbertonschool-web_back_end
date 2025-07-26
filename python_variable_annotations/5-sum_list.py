@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-""" Modulo que suma los datos de una listas"""
-
+"""Módulo que suma los datos de una lista de flotantes."""
 
 from typing import List
 
-
-def sum_list(input_list: list[float]) -> float:
-    "Funcion que usa la funcion suma con los datos de la lista"
+def sum_list(input_list: List[float]) -> float:
+    """Función que devuelve la suma de los elementos de una lista de flotantes."""
     return sum(input_list)
