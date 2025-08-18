@@ -5,62 +5,60 @@
 import csv
 import math
 from typing import List, Dict, Any
-import os
-
-
-def index_range(page: int, page_size: int):
-    """funcion que calcula la paginacion"""
-    inicio = ((page - 1) * page_size)
-    fin = page * page_size
-    return inicio, fin
-
 
 class Server:
-    """Server class to paginate a database of popular baby names.
-    """
+    """Server class to paginate a database of popular baby names."""
     DATA_FILE = "Popular_Baby_Names.csv"
 
     def __init__(self):
         self.__dataset = None
+        self.__indexed_dataset = None
 
     def dataset(self) -> List[List]:
-        """Cached dataset
-        """
+        """Cached dataset"""
         if self.__dataset is None:
-            with open(self.DATA_FILE) as f:
+            with open(self.DATA_FILE, newline="") as f:
                 reader = csv.reader(f)
                 dataset = [row for row in reader]
             self.__dataset = dataset[1:]
-
         return self.__dataset
 
-    def get_page(self, page: int = 1, page_size: int = 10) -> List[List]:
-        """Devuelve una página del dataset"""
-        assert isinstance(page, int) and page > 0
+    def indexed_dataset(self) -> Dict[int, List]:
+        """Dataset indexed by sorting position, starting at 0"""
+        if self.__indexed_dataset is None:
+            data = self.dataset()
+            self.__indexed_dataset = {i: row for i, row in enumerate(data)}
+        return self.__indexed_dataset
+
+    def get_hyper_index(self, index: int = None, page_size: int = 10) -> Dict[str, Any]:
+        """Return deletion-resilient page starting at `index`."""
+        assert isinstance(index, int) and index >= 0
         assert isinstance(page_size, int) and page_size > 0
 
-        start, end = index_range(page, page_size)
-        dataset = self.dataset()
+        indexed = self.indexed_dataset()
+        if not indexed:
+            return {"index": index, "next_index": None, "page_size": 0, "data": []}
 
-        return dataset[start:end]
+        max_idx = max(indexed.keys())
+        assert index <= max_idx
 
-    def get_hyper(self, page: int = 1, page_size: int = 10) -> Dict[str, Any]:
-        """Devuelve metadatos de paginación junto con la página de datos."""
-        data = self.get_page(page, page_size)
+        data = []
+        current = index
+        collected = 0
 
-        total_items = len(self.dataset())
-        tot_pages = math.ceil(total_items / page_size) if page_size > 0 else 0
+        while collected < page_size and current <= max_idx:
+            item = indexed.get(current)
+            if item is not None:
+                data.append(item)
+                collected += 1
+            current += 1
 
-        current_page_size = len(data)
-
-        prev_page = page - 1 if page > 1 else None
-        next_page = page + 1 if page < tot_pages else None
+        next_index = current if current <= max_idx else None
 
         return {
-            "page_size": current_page_size,
-            "page": page,
+            "index": index,
+            "next_index": next_index,
+            "page_size": len(data),
             "data": data,
-            "next_page": next_page,
-            "prev_page": prev_page,
-            "total_pages": tot_pages,
         }
+
