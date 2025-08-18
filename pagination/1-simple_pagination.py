@@ -7,6 +7,7 @@ import math
 from typing import List
 import os
 
+
 def index_range(page: int, page_size: int):
     """funcion que calcula la paginacion"""
     inicio = ((page - 1) * page_size)
@@ -17,7 +18,7 @@ def index_range(page: int, page_size: int):
 class Server:
     """Server class to paginate a database of popular baby names.
     """
-    DATA_FILE = os.path.join(os.path.dirname(__file__), "Popular_Baby_Names.csv")
+    DATA_FILE = "Popular_Baby_Names.csv"
 
     def __init__(self):
         self.__dataset = None
