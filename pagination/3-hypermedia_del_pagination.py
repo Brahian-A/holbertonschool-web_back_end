@@ -30,11 +30,7 @@ class Server:
             self.__indexed_dataset = {i: row for i, row in enumerate(data)}
         return self.__indexed_dataset
 
-    def get_hyper_index(
-        self,
-        index: int = None,
-        page_size: int = 10
-    ) -> Dict[str, Any]:
+    def get_hyper_index(self, index: int = None, page_size: int = 10) -> dict:
         """Return deletion-resilient page starting at `index`."""
         assert isinstance(index, int) and index >= 0
         assert isinstance(page_size, int) and page_size > 0
